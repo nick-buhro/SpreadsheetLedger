@@ -101,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\RecordService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="JournalSheet.cs">
       <DependentUpon>SpreadsheetLedger.xlsb</DependentUpon>
@@ -125,6 +126,13 @@
     </Compile>
     <Compile Include="PriceSheet.Designer.cs">
       <DependentUpon>PriceSheet.Designer.xml</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\Context.cs" />
+    <Compile Include="GLSheet.cs">
+      <DependentUpon>SpreadsheetLedger.xlsb</DependentUpon>
+    </Compile>
+    <Compile Include="GLSheet.Designer.cs">
+      <DependentUpon>GLSheet.Designer.xml</DependentUpon>
     </Compile>
     <Compile Include="SpreadsheetLedgerRibbon.cs">
       <SubType>Component</SubType>
@@ -196,6 +204,11 @@
       <Name>SpreadsheetLedger.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="GLSheet.Designer.xml">
+      <DependentUpon>GLSheet.cs</DependentUpon>
+    </None>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -216,10 +229,11 @@
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
         <ProjectProperties HostName="SpreadsheetLedger.xlsb" HostPackage="{3F2B7691-D1D1-402F-9370-2704A737CF60}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="XLS" Language="CS" TemplatesPath="VSTOTemplates" DebugInfoExeName="C:\Program Files\Microsoft Office\root\Office16\excel.exe" DebugInfoCommandLine="/t /x &quot;[$OUTPUT]SpreadsheetLedger.xlsb&quot;" />
         <Host Name="Excel Document" Path=".\SpreadsheetLedger.xlsb" GeneratedCodeNamespace="SpreadsheetLedger">
-          <HostItem Name="Sheet1" Code="JournalSheet.cs" CanonicalName="Sheet1" DisplayName="Journal" Blueprint="JournalSheet.Designer.xml" GeneratedCode="JournalSheet.Designer.cs" />
           <HostItem Name="Sheet2" Code="CoASheet.cs" CanonicalName="Sheet2" DisplayName="CoA" Blueprint="CoASheet.Designer.xml" GeneratedCode="CoASheet.Designer.cs" />
           <HostItem Name="Sheet3" Code="CoPLSheet.cs" CanonicalName="Sheet3" DisplayName="CoPL" Blueprint="CoPLSheet.Designer.xml" GeneratedCode="CoPLSheet.Designer.cs" />
+          <HostItem Name="Sheet1" Code="JournalSheet.cs" CanonicalName="Sheet1" DisplayName="Journal" Blueprint="JournalSheet.Designer.xml" GeneratedCode="JournalSheet.Designer.cs" />
           <HostItem Name="Sheet4" Code="PriceSheet.cs" CanonicalName="Sheet4" DisplayName="Price" Blueprint="PriceSheet.Designer.xml" GeneratedCode="PriceSheet.Designer.cs" />
+          <HostItem Name="Sheet5" Code="GLSheet.cs" CanonicalName="Sheet5" DisplayName="GL" Blueprint="GLSheet.Designer.xml" GeneratedCode="GLSheet.Designer.cs" />
           <HostItem Name="ThisWorkbook" Code="ThisWorkbook.cs" CanonicalName="ThisWorkbook" Blueprint="ThisWorkbook.Designer.xml" GeneratedCode="ThisWorkbook.Designer.cs" />
         </Host>
       </FlavorProperties>

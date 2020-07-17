@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpreadsheetLedger.Core.Models.Attributes
+namespace SpreadsheetLedger.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     internal sealed class MandatoryAttribute : Attribute

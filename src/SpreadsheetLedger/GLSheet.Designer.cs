@@ -13,11 +13,11 @@ namespace SpreadsheetLedger {
     
     
     /// 
-    [Microsoft.VisualStudio.Tools.Applications.Runtime.StartupObjectAttribute(4)]
+    [Microsoft.VisualStudio.Tools.Applications.Runtime.StartupObjectAttribute(5)]
     [global::System.Security.Permissions.PermissionSetAttribute(global::System.Security.Permissions.SecurityAction.Demand, Name="FullTrust")]
-    public sealed partial class JournalSheet : Microsoft.Office.Tools.Excel.WorksheetBase {
+    public sealed partial class GLSheet : Microsoft.Office.Tools.Excel.WorksheetBase {
         
-        internal Microsoft.Office.Tools.Excel.ListObject JournalTable;
+        internal Microsoft.Office.Tools.Excel.ListObject GLTable;
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         private global::System.Object missing = global::System.Type.Missing;
@@ -25,8 +25,8 @@ namespace SpreadsheetLedger {
         /// 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        public JournalSheet(global::Microsoft.Office.Tools.Excel.Factory factory, global::System.IServiceProvider serviceProvider) : 
-                base(factory, serviceProvider, "Sheet1", "Sheet1") {
+        public GLSheet(global::Microsoft.Office.Tools.Excel.Factory factory, global::System.IServiceProvider serviceProvider) : 
+                base(factory, serviceProvider, "Sheet5", "Sheet5") {
         }
         
         /// 
@@ -35,7 +35,7 @@ namespace SpreadsheetLedger {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         protected override void Initialize() {
             base.Initialize();
-            Globals.JournalSheet = this;
+            Globals.GLSheet = this;
             global::System.Windows.Forms.Application.EnableVisualStyles();
             this.InitializeCachedData();
             this.InitializeControls();
@@ -116,7 +116,7 @@ namespace SpreadsheetLedger {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void BeginInitialization() {
             this.BeginInit();
-            this.JournalTable.BeginInit();
+            this.GLTable.BeginInit();
         }
         
         /// 
@@ -124,7 +124,7 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void EndInitialization() {
-            this.JournalTable.EndInit();
+            this.GLTable.EndInit();
             this.EndInit();
         }
         
@@ -133,7 +133,7 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void InitializeControls() {
-            this.JournalTable = Globals.Factory.CreateListObject(null, null, "Sheet1:JournalTable", "JournalTable", this);
+            this.GLTable = Globals.Factory.CreateListObject(null, null, "Sheet5:GLTable", "GLTable", this);
         }
         
         /// 
@@ -141,9 +141,6 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void InitializeComponents() {
-            // 
-            // JournalSheet
-            // 
         }
         
         /// 
@@ -158,22 +155,22 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         protected override void OnShutdown() {
-            this.JournalTable.Dispose();
+            this.GLTable.Dispose();
             base.OnShutdown();
         }
     }
     
     internal sealed partial class Globals {
         
-        private static JournalSheet _JournalSheet;
+        private static GLSheet _GLSheet;
         
-        internal static JournalSheet JournalSheet {
+        internal static GLSheet GLSheet {
             get {
-                return _JournalSheet;
+                return _GLSheet;
             }
             set {
-                if ((_JournalSheet == null)) {
-                    _JournalSheet = value;
+                if ((_GLSheet == null)) {
+                    _GLSheet = value;
                 }
                 else {
                     throw new System.NotSupportedException();

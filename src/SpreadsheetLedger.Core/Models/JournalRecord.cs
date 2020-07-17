@@ -1,12 +1,11 @@
-﻿using SpreadsheetLedger.Core.Models.Attributes;
+﻿using SpreadsheetLedger.Core.Attributes;
 using System;
 
 namespace SpreadsheetLedger.Core.Models
-{    
-    public sealed class JournalRecord: Record
+{
+    public sealed class JournalRecord
     {
-        [Mandatory(true)]
-        public DateTime Date { get; private set; }
+        public DateTime? Date { get; private set; }
 
         public string R { get; private set; }
 
@@ -19,15 +18,12 @@ namespace SpreadsheetLedger.Core.Models
         [Name("To Balance")]
         public decimal? ToBalance { get; private set; }
 
-        [Mandatory]
         [Name("Comm")]
         public string Commodity { get; private set; }
 
-        [Mandatory]
         [Name("Account Id")]
         public string AccountId { get; private set; }
 
-        [Mandatory]
         [Name("P/L Category Id")]
         public string PLCategoryId { get; private set; }
 
@@ -43,5 +39,10 @@ namespace SpreadsheetLedger.Core.Models
         [Name("Source Memo")]
         public string SourceMemo { get; private set; }
 
+
+        public override string ToString()
+        {
+            return $"{Date:d} {R} {Num} {Description}\t {Amount,6}{ToBalance,6} {Commodity} [{AccountId} <= {PLCategoryId}]";
+        }
     }
 }

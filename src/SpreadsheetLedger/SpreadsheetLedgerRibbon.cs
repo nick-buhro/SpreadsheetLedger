@@ -1,31 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Microsoft.Office.Tools.Ribbon;
 using SpreadsheetLedger.Core;
-using SpreadsheetLedger.Core.Models;
+using SpreadsheetLedger.Core.Commands;
+using SpreadsheetLedger.Helpers;
 
 namespace SpreadsheetLedger
 {
     public partial class SpreadsheetLedgerRibbon
     {
+        private IContext _context;
+        private ICommand _glRefreshCommand;
+
         private void SpreadsheetLedgerRibbon_Load(object sender, RibbonUIEventArgs e)
         {
-
+            _context = new Context();
+            _glRefreshCommand = new GLRefreshCommand(_context);
         }
 
         private void buttonGLRefresh_Click(object sender, RibbonControlEventArgs e)
         {
             try
             {
-                var lo = Globals.JournalSheet.ListObjects[1];
-                var data = RecordManager.Read<JournalRecord>(
-                    lo.HeaderRowRange.Value,
-                    lo.DataBodyRange.Value);
-
-                MessageBox.Show($"{data.Count} rows read.");
+                _glRefreshCommand.Execute();
             }
             catch (Exception ex)
             {

@@ -17,6 +17,8 @@ namespace SpreadsheetLedger {
     [global::System.Security.Permissions.PermissionSetAttribute(global::System.Security.Permissions.SecurityAction.Demand, Name="FullTrust")]
     public sealed partial class CoPLSheet : Microsoft.Office.Tools.Excel.WorksheetBase {
         
+        internal Microsoft.Office.Tools.Excel.ListObject CoPLTable;
+        
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         private global::System.Object missing = global::System.Type.Missing;
         
@@ -114,6 +116,7 @@ namespace SpreadsheetLedger {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void BeginInitialization() {
             this.BeginInit();
+            this.CoPLTable.BeginInit();
         }
         
         /// 
@@ -121,6 +124,7 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void EndInitialization() {
+            this.CoPLTable.EndInit();
             this.EndInit();
         }
         
@@ -129,6 +133,7 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void InitializeControls() {
+            this.CoPLTable = Globals.Factory.CreateListObject(null, null, "Sheet3:CoPLTable", "CoPLTable", this);
         }
         
         /// 
@@ -143,6 +148,15 @@ namespace SpreadsheetLedger {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         private bool NeedsFill(string MemberName) {
             return this.DataHost.NeedsFill(this, MemberName);
+        }
+        
+        /// 
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        protected override void OnShutdown() {
+            this.CoPLTable.Dispose();
+            base.OnShutdown();
         }
     }
     
