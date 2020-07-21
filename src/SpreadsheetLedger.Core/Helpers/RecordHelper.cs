@@ -68,15 +68,16 @@ namespace SpreadsheetLedger.Core.Helpers
                             if ((pi.PropertyType == typeof(decimal)) || (pi.PropertyType == typeof(decimal?)))
                             {
                                 var value = data[i + firstRowIndex, c];
-                                var money = (value == null)
-                                    ? (decimal?) null
-                                    : Convert.ToDecimal(value);
-
-                                pi.SetValue(record, money);
+                                pi.SetValue(record, ToDecimal(value));                                
+                            }
+                            else if (pi.PropertyType == typeof(string))
+                            {
+                                var value = data[i + firstRowIndex, c];
+                                pi.SetValue(record, value?.ToString());
                             }
                             else
                             {
-                                pi.SetValue(record, data[i + firstRowIndex, c]);
+                               pi.SetValue(record, data[i + firstRowIndex, c]);                               
                             }
                             break;
                         }
@@ -89,6 +90,17 @@ namespace SpreadsheetLedger.Core.Helpers
             }
 
             return result;
+        }
+
+        private static decimal? ToDecimal(object value)
+        {
+            if (value == null)
+                return null;
+
+            if ((value as string)?.Trim() == "")
+                return null;
+
+            return Convert.ToDecimal(value);
         }
     }
 }

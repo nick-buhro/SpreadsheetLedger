@@ -217,7 +217,8 @@ namespace SpreadsheetLedger.Core.Commands
         {
             if (dt.AddDays(1).Day != 1) return;
 
-            foreach (var key in _balanceTable.Keys)
+            var keys = _balanceTable.Keys.ToList();
+            foreach (var key in keys)
             {
                 if (key.comm == _context.BaseCommodity) continue;
                 
@@ -232,8 +233,13 @@ namespace SpreadsheetLedger.Core.Commands
 
                 // Find other accounts;
 
-                var category = _categoryIndex[account.RevaluationPLCategory];
-                var closingAccount = _accountIndex[category.ClosingAccount];
+                var category = TryExecute(
+                    () => _categoryIndex[account.RevaluationPLCategory],
+                    $"Revaluation P/L Category for account '{account.AccountId}' not found.");
+
+                var closingAccount = TryExecute(
+                    () => _accountIndex[category.ClosingAccount],
+                    $"Closing Account for category '{category.PLCategoryId}' not found.");
 
                 // Validate accounts
 
@@ -302,6 +308,17 @@ namespace SpreadsheetLedger.Core.Commands
             }
         }
 
+        private static T TryExecute<T>(Func<T> action, string errorMessage)
+        {
+            try
+            {
+                return action();
+            }
+            catch
+            {
+                throw new Exception(errorMessage);
+            }
+        }
 
         private (decimal amount, decimal amountbc) UpdateBalanceTable(string accountId, string commodity, decimal amount, decimal amountbc)
         {

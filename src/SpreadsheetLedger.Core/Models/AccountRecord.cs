@@ -22,7 +22,7 @@ namespace SpreadsheetLedger.Core.Models
         [Name("Account Type")]
         public string Type { get; private set; }
 
-        [Name("Revaluation P/L Category")]
+        [Name("Revaluation P/L Category Id")]
         public string RevaluationPLCategory { get; private set; }
                 
         public string Project { get; private set; }

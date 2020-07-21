@@ -9,27 +9,29 @@
 //------------------------------------------------------------------------------
 
 #pragma warning disable 414
-namespace SpreadsheetLedger {
+namespace SpreadsheetLedger.ExcelAddIn {
     
     
     /// 
     [Microsoft.VisualStudio.Tools.Applications.Runtime.StartupObjectAttribute(0)]
     [global::System.Security.Permissions.PermissionSetAttribute(global::System.Security.Permissions.SecurityAction.Demand, Name="FullTrust")]
-    public sealed partial class ThisWorkbook : Microsoft.Office.Tools.Excel.WorkbookBase {
+    public sealed partial class ThisAddIn : Microsoft.Office.Tools.AddInBase {
         
-        internal Microsoft.Office.Tools.ActionsPane ActionsPane;
+        internal Microsoft.Office.Tools.CustomTaskPaneCollection CustomTaskPanes;
+        
+        internal Microsoft.Office.Tools.SmartTagCollection VstoSmartTags;
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         private global::System.Object missing = global::System.Type.Missing;
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
-        internal Microsoft.Office.Interop.Excel.Application ThisApplication;
+        internal Microsoft.Office.Interop.Excel.Application Application;
         
         /// 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        public ThisWorkbook(global::Microsoft.Office.Tools.Excel.Factory factory, global::System.IServiceProvider serviceProvider) : 
-                base(factory, serviceProvider, "ThisWorkbook", "ThisWorkbook") {
+        public ThisAddIn(global::Microsoft.Office.Tools.Excel.ApplicationFactory factory, global::System.IServiceProvider serviceProvider) : 
+                base(factory, serviceProvider, "AddIn", "ThisAddIn") {
             Globals.Factory = factory;
         }
         
@@ -39,8 +41,8 @@ namespace SpreadsheetLedger {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         protected override void Initialize() {
             base.Initialize();
-            this.ThisApplication = this.GetHostItem<Microsoft.Office.Interop.Excel.Application>(typeof(Microsoft.Office.Interop.Excel.Application), "Application");
-            Globals.ThisWorkbook = this;
+            this.Application = this.GetHostItem<Microsoft.Office.Interop.Excel.Application>(typeof(Microsoft.Office.Interop.Excel.Application), "Application");
+            Globals.ThisAddIn = this;
             global::System.Windows.Forms.Application.EnableVisualStyles();
             this.InitializeCachedData();
             this.InitializeControls();
@@ -121,7 +123,8 @@ namespace SpreadsheetLedger {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void BeginInitialization() {
             this.BeginInit();
-            this.ActionsPane.BeginInit();
+            this.CustomTaskPanes.BeginInit();
+            this.VstoSmartTags.BeginInit();
         }
         
         /// 
@@ -129,7 +132,8 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void EndInitialization() {
-            this.ActionsPane.EndInit();
+            this.VstoSmartTags.EndInit();
+            this.CustomTaskPanes.EndInit();
             this.EndInit();
         }
         
@@ -138,7 +142,8 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void InitializeControls() {
-            this.ActionsPane = Globals.Factory.CreateActionsPane(null, null, "ActionsPane", "ActionsPane", this);
+            this.CustomTaskPanes = Globals.Factory.CreateCustomTaskPaneCollection(null, null, "CustomTaskPanes", "CustomTaskPanes", this);
+            this.VstoSmartTags = Globals.Factory.CreateSmartTagCollection(null, null, "VstoSmartTags", "VstoSmartTags", this);
         }
         
         /// 
@@ -160,7 +165,8 @@ namespace SpreadsheetLedger {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         protected override void OnShutdown() {
-            this.ActionsPane.Dispose();
+            this.VstoSmartTags.Dispose();
+            this.CustomTaskPanes.Dispose();
             base.OnShutdown();
         }
     }
@@ -174,19 +180,19 @@ namespace SpreadsheetLedger {
         private Globals() {
         }
         
-        private static ThisWorkbook _ThisWorkbook;
+        private static ThisAddIn _ThisAddIn;
         
-        private static global::Microsoft.Office.Tools.Excel.Factory _factory;
+        private static global::Microsoft.Office.Tools.Excel.ApplicationFactory _factory;
         
         private static ThisRibbonCollection _ThisRibbonCollection;
         
-        internal static ThisWorkbook ThisWorkbook {
+        internal static ThisAddIn ThisAddIn {
             get {
-                return _ThisWorkbook;
+                return _ThisAddIn;
             }
             set {
-                if ((_ThisWorkbook == null)) {
-                    _ThisWorkbook = value;
+                if ((_ThisAddIn == null)) {
+                    _ThisAddIn = value;
                 }
                 else {
                     throw new System.NotSupportedException();
@@ -194,7 +200,7 @@ namespace SpreadsheetLedger {
             }
         }
         
-        internal static global::Microsoft.Office.Tools.Excel.Factory Factory {
+        internal static global::Microsoft.Office.Tools.Excel.ApplicationFactory Factory {
             get {
                 return _factory;
             }

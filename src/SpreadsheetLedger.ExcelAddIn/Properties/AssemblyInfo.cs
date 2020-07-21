@@ -6,11 +6,11 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SpreadsheetLedger")]
+[assembly: AssemblyTitle("SpreadsheetLedger.ExcelAddIn")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SpreadsheetLedger")]
+[assembly: AssemblyProduct("SpreadsheetLedger.ExcelAddIn")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -21,7 +21,7 @@ using System.Security;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5781910b-7235-4277-a0a1-c89f0fda4e23")]
+[assembly: Guid("47da15a8-0133-43d7-81c8-f420320b901b")]
 
 // Version information for an assembly consists of the following four values:
 //

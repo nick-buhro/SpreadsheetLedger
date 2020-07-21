@@ -4,10 +4,10 @@ using SpreadsheetLedger.Core.Helpers;
 using System;
 using System.Collections.Generic;
 
-namespace SpreadsheetLedger.Helpers
+namespace SpreadsheetLedger.ExcelAddIn.IO
 {
     internal sealed class RecordService<T> : IRecordService<T>
-        where T: new()
+        where T : new()
     {
         private readonly ListObject _list;
 
@@ -33,7 +33,7 @@ namespace SpreadsheetLedger.Helpers
                 //var ws = (Worksheet)_list.Parent;
                 //ws.ShowAllData();
 
-                if (_list.DataBodyRange == null)                
+                if (_list.DataBodyRange == null)
                     _list.ListRows.AddEx();
                 else
                     _list.DataBodyRange.ClearContents();
@@ -43,7 +43,7 @@ namespace SpreadsheetLedger.Helpers
                     .Resize[(data.Count == 0) ? 2 : (1 + data.Count), _list.DataBodyRange.Columns.Count];
 
                 _list.Resize(newDataRange);
-                               
+
 
                 if (data.Count > 0)
                 {
