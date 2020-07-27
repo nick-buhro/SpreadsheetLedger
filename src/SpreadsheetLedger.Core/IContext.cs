@@ -11,9 +11,7 @@ namespace SpreadsheetLedger.Core
         IRecordService<PriceRecord> Prices { get; }
 
         IRecordService<AccountRecord> CoA { get; }
-
-        IRecordService<PLCategoryRecord> CoPL { get; }
-
+        
 
         string BaseCommodity { get; }
     }

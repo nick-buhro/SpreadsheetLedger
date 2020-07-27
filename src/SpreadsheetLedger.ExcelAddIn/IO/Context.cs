@@ -15,19 +15,16 @@ namespace SpreadsheetLedger.ExcelAddIn.IO
 
         public IRecordService<PriceRecord> Prices { get; }
 
-        public IRecordService<AccountRecord> CoA { get; }
-
-        public IRecordService<PLCategoryRecord> CoPL { get; }
+        public IRecordService<AccountRecord> CoA { get; }        
 
         public Context()
         {
             var wb = Globals.ThisAddIn.Application.ActiveWorkbook;
 
             GL = new RecordService<GLRecord>(FindListObject(wb, "GL"));
-            Journal = new RecordService<JournalRecord>(FindListObject(wb, "Journal"));
-            Prices = new RecordService<PriceRecord>(FindListObject(wb, "Price"));
-            CoA = new RecordService<AccountRecord>(FindListObject(wb, "CoA"));
-            CoPL = new RecordService<PLCategoryRecord>(FindListObject(wb, "CoPL"));
+            Journal = new RecordService<JournalRecord>(FindListObject(wb, "JournalTable"));
+            Prices = new RecordService<PriceRecord>(FindListObject(wb, "PriceTable"));
+            CoA = new RecordService<AccountRecord>(FindListObject(wb, "CoBATable"));
         }
 
         private static ListObject FindListObject(Workbook wb, string listName)

@@ -11,7 +11,7 @@ namespace SpreadsheetLedger.Core.Models
 
         public string Num { get; set; }
 
-        public string Description { get; set; }
+        public string Text { get; set; }
 
         public decimal? Amount { get; set; }
                 
@@ -23,6 +23,9 @@ namespace SpreadsheetLedger.Core.Models
 
         [Name("Account Id")]
         public string AccountId { get; set; }
+
+        [Name("Account Name")]
+        public string AccountName { get; set; }
 
         [Name("Account Name 1")]
         public string AccountName1 { get; set; }
@@ -39,26 +42,16 @@ namespace SpreadsheetLedger.Core.Models
         [Name("Account Type")]
         public string AccountType { get; set; }
 
+        [Name("Offset Account Id")]
+        public string OffsetAccountId { get; set; }
 
-        [Name("P/L Category Id")]
-        public string PLCategoryId { get; set; }
+        [Name("Offset Account Name")]
+        public string OffsetAccountName { get; set; }
 
-        [Name("P/L Category Name 1")]
-        public string PLCategoryName1 { get; set; }
-
-        [Name("P/L Category Name 2")]
-        public string PLCategoryName2 { get; set; }
-
-        [Name("P/L Category Name 3")]
-        public string PLCategoryName3 { get; set; }
-
-
-        [Name("P/L Tag")]
-        public string PLTag { get; set; }
+        public string Tag { get; set; }
 
         public string Project { get; set; }
-
-        public bool Closing { get; set; }
+                
 
         [Name("Source Ref")]
         public string SourceRef { get; set; }
@@ -66,7 +59,7 @@ namespace SpreadsheetLedger.Core.Models
         [Name("Source Ln")]
         public string SourceLn { get; set; }
 
-        [Name("Source Memo")]
-        public string SourceMemo { get; set; }
+        [Name("Source Text")]
+        public string SourceText { get; set; }
     }
 }

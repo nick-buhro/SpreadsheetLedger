@@ -48,7 +48,6 @@
     <Compile Include="Commands\GLRefreshCommand.cs" />
     <Compile Include="IContext.cs" />
     <Compile Include="Models\GLRecord.cs" />
-    <Compile Include="Models\PLCategoryRecord.cs" />
     <Compile Include="Models\AccountRecord.cs" />
     <Compile Include="Models\JournalRecord.cs" />
     <Compile Include="Models\PriceRecord.cs" />

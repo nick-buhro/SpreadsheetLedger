@@ -11,8 +11,7 @@ namespace SpreadsheetLedger.Core.Commands
     {
         private readonly IContext _context;
 
-        private IDictionary<string, AccountRecord> _accountIndex;
-        private IDictionary<string, PLCategoryRecord> _categoryIndex;
+        private IDictionary<string, AccountRecord> _accountIndex;        
         private Pricelist _pricelist;
         private IList<JournalRecord> _journalRecords;
         private IList<GLRecord> _result;        
@@ -34,11 +33,7 @@ namespace SpreadsheetLedger.Core.Commands
                 _accountIndex = _context.CoA.Read()
                     .Where(a => !string.IsNullOrEmpty(a.AccountId))
                     .ToDictionary(a => a.AccountId);
-
-                _categoryIndex = _context.CoPL.Read()
-                    .Where(c => !string.IsNullOrEmpty(c.PLCategoryId))
-                    .ToDictionary(c => c.PLCategoryId);
-
+                                
                 _pricelist = new Pricelist(
                     _context.BaseCommodity,
                     _context.Prices.Read());
@@ -77,7 +72,6 @@ namespace SpreadsheetLedger.Core.Commands
             finally
             {
                 _accountIndex = null;
-                _categoryIndex = null;
                 _pricelist = null;
                 _journalRecords = null;
                 _result = null;
@@ -122,15 +116,13 @@ namespace SpreadsheetLedger.Core.Commands
 
                     // Find accounts
 
-                    var account = _accountIndex[j.AccountId];
-                    var category = _categoryIndex[j.PLCategoryId];
-                    var closingAccount = _accountIndex[category.ClosingAccount];
+                    var account = TryExecute(
+                        () => _accountIndex[j.AccountId],
+                        $"Account '{j.AccountId}' not found.");
 
-                    // Validate accounts
-
-                    IsEquityAccount(account);
-                    if (!IsEquityAccount(closingAccount))
-                        throw new Exception($"Closing account for '{j.PLCategoryId}' is not of type 'E' (Equity).");
+                    var offsetAccount = TryExecute(
+                        () => _accountIndex[j.OffsetAccountId],
+                        $"Offset account '{j.OffsetAccountId}' not found.");                                        
 
                     // Validate project
 
@@ -138,73 +130,21 @@ namespace SpreadsheetLedger.Core.Commands
                     if (!string.IsNullOrEmpty(account.Project))
                     {
                         project = account.Project;
-                        if (!string.IsNullOrEmpty(category.Project) && (category.Project != project))
-                            throw new Exception($"'{j.AccountId} account project doesn't equal to '{j.PLCategoryId}' P/L Category project.");
+                        if (!string.IsNullOrEmpty(offsetAccount.Project) && (offsetAccount.Project != project))
+                            throw new Exception($"'{j.AccountId} account project doesn't equal to '{j.OffsetAccountId}' offset account project.");
                     }
-                    if (!string.IsNullOrEmpty(category.Project))
+                    if (!string.IsNullOrEmpty(offsetAccount.Project))
                     {
-                        project = category.Project;
+                        project = offsetAccount.Project;
                     }
 
-                    // Add GL record                    
+                    // Add GL record
 
-                    UpdateBalanceTable(j.AccountId, j.Commodity, amount, amountbc);
-                    _result.Add(new GLRecord
-                    {
-                        Date = dt,
-                        R = j.R,
-                        Num = j.Num,
-                        Description = j.Description,
-                        Amount = amount,
-                        Commodity = j.Commodity,
-                        AmountDC = amountbc,
-                        AccountId = account.AccountId,
-                        AccountName1 = account.Name1,
-                        AccountName2 = account.Name2,
-                        AccountName3 = account.Name3,
-                        AccountName4 = account.Name4,
-                        AccountType = account.Type,
-                        PLCategoryId = category.PLCategoryId,
-                        PLCategoryName1 = category.Name1,
-                        PLCategoryName2 = category.Name2,
-                        PLCategoryName3 = category.Name3,
-                        PLTag = j.PLTag,
-                        Project = project,
-                        Closing = false,
-                        SourceRef = j.SourceRef,
-                        SourceLn = j.SourceLn,
-                        SourceMemo = j.SourceMemo
-                    });
-
-                    // Add closing GL record                    
-
-                    UpdateBalanceTable(closingAccount.AccountId, j.Commodity, -amount, -amountbc);
-                    _result.Add(new GLRecord
-                    {
-                        Date = dt,
-                        R = j.R,
-                        Num = j.Num,
-                        Description = j.Description,
-                        Amount = -amount,
-                        Commodity = j.Commodity,
-                        AmountDC = -amountbc,
-                        AccountId = closingAccount.AccountId,
-                        AccountName1 = closingAccount.Name1,
-                        AccountName2 = closingAccount.Name2,
-                        AccountName3 = closingAccount.Name3,
-                        AccountName4 = closingAccount.Name4,
-                        AccountType = closingAccount.Type,
-                        PLCategoryId = category.PLCategoryId,
-                        PLCategoryName1 = category.Name1,
-                        PLCategoryName2 = category.Name2,
-                        PLCategoryName3 = category.Name3,
-                        PLTag = j.PLTag,
-                        Project = project,
-                        Closing = true,
-                        SourceRef = j.SourceRef,
-                        SourceLn = j.SourceLn,
-                        SourceMemo = j.SourceMemo
-                    });
+                    AddGLTransaction(
+                        dt, j.R, j.Num, j.Text, amount, j.Commodity, amountbc,
+                        account, offsetAccount,
+                        j.Tag, project,
+                        j.SourceRef, j.SourceLn, j.SourceText);
                 }
                 catch (Exception ex)
                 {
@@ -212,7 +152,7 @@ namespace SpreadsheetLedger.Core.Commands
                 }                
             }
         }
-
+                
         private void AppendRevaluations(DateTime dt)
         {
             if (dt.AddDays(1).Day != 1) return;
@@ -231,20 +171,14 @@ namespace SpreadsheetLedger.Core.Commands
                 var correction = _pricelist.CalculateAmountBC(dt, balance.amount, key.comm) - balance.amountbc;
                 if (correction == 0) continue;
 
-                // Find other accounts;
+                // Find revaluation account
 
-                var category = TryExecute(
-                    () => _categoryIndex[account.RevaluationPLCategory],
-                    $"Revaluation P/L Category for account '{account.AccountId}' not found.");
-
-                var closingAccount = TryExecute(
-                    () => _accountIndex[category.ClosingAccount],
-                    $"Closing Account for category '{category.PLCategoryId}' not found.");
-
-                // Validate accounts
-
-                if (!IsEquityAccount(closingAccount))
-                    throw new Exception($"Closing account for '{category.PLCategoryId}' is not of type 'E' (Equity).");
+                var revaluationAccount = TryExecute(
+                    () => _accountIndex[account.RevaluationAccountId],
+                    $"Revaluation account '{account.RevaluationAccountId}' for '{account.AccountId}' not found.");
+                
+                if (!IsEquityAccount(revaluationAccount))
+                    throw new Exception($"Revaluation account '{account.RevaluationAccountId}' for '{account.AccountId}' is not of type 'E' (Equity).");
 
                 // Validate project
 
@@ -252,73 +186,80 @@ namespace SpreadsheetLedger.Core.Commands
                 if (!string.IsNullOrEmpty(account.Project))
                 {
                     project = account.Project;
-                    if (!string.IsNullOrEmpty(category.Project) && (category.Project != project))
-                        throw new Exception($"'{account.AccountId} account project doesn't equal to '{category.PLCategoryId}' P/L Category project.");
+                    if (!string.IsNullOrEmpty(revaluationAccount.Project) && (revaluationAccount.Project != project))
+                        throw new Exception($"'{account.AccountId} account project doesn't equal to '{revaluationAccount.AccountId}' revaluation account project.");
                 }
-                if (!string.IsNullOrEmpty(category.Project))
+                if (!string.IsNullOrEmpty(revaluationAccount.Project))
                 {
-                    project = category.Project;
+                    project = revaluationAccount.Project;
                 }
 
                 // Add GL record                    
 
-                UpdateBalanceTable(key.account, key.comm, 0, correction);
-                _result.Add(new GLRecord
-                {
-                    Date = dt,
-                    R = "r",                                        
-                    Commodity = key.comm,
-                    AmountDC = correction,
-                    AccountId = account.AccountId,
-                    AccountName1 = account.Name1,
-                    AccountName2 = account.Name2,
-                    AccountName3 = account.Name3,
-                    AccountName4 = account.Name4,
-                    AccountType = account.Type,
-                    PLCategoryId = category.PLCategoryId,
-                    PLCategoryName1 = category.Name1,
-                    PLCategoryName2 = category.Name2,
-                    PLCategoryName3 = category.Name3,                    
-                    Project = project,
-                    Closing = false
-                });
-
-                // Add closing GL record                    
-
-                UpdateBalanceTable(closingAccount.AccountId, key.comm, 0, -correction);
-                _result.Add(new GLRecord
-                {
-                    Date = dt,
-                    R = "r",
-                    Commodity = key.comm,
-                    AmountDC = -correction,
-                    AccountId = closingAccount.AccountId,
-                    AccountName1 = closingAccount.Name1,
-                    AccountName2 = closingAccount.Name2,
-                    AccountName3 = closingAccount.Name3,
-                    AccountName4 = closingAccount.Name4,
-                    AccountType = closingAccount.Type,
-                    PLCategoryId = category.PLCategoryId,
-                    PLCategoryName1 = category.Name1,
-                    PLCategoryName2 = category.Name2,
-                    PLCategoryName3 = category.Name3,
-                    Project = project,
-                    Closing = true
-                });
+                AddGLTransaction(dt, "r", null, null, null, key.comm, correction, account, revaluationAccount, null, project, null, null, null);
             }
         }
 
-        private static T TryExecute<T>(Func<T> action, string errorMessage)
+
+        private void AddGLTransaction(
+            DateTime date, string r, string num, string text, decimal? amount, string comm, decimal amountdc,
+            AccountRecord account, AccountRecord offset,
+            string tag, string project, string sourceRef, string sourceLn, string sourceText)
         {
-            try
+            UpdateBalanceTable(account.AccountId, comm, amount ?? 0, amountdc);
+            UpdateBalanceTable(offset.AccountId, comm, -amount ?? 0, -amountdc);
+
+            _result.Add(new GLRecord
             {
-                return action();
-            }
-            catch
+                Date = date,
+                R = r,
+                Num = num,
+                Text = text,
+                Amount = amount,
+                Commodity = comm,
+                AmountDC = amountdc,
+                AccountId = account.AccountId,
+                AccountName = account.Name,
+                AccountName1 = account.Name1,
+                AccountName2 = account.Name2,
+                AccountName3 = account.Name3,
+                AccountName4 = account.Name4,
+                AccountType = account.Type,
+                OffsetAccountId = offset.AccountId,
+                OffsetAccountName = offset.Name,
+                Tag = tag,
+                Project = project,
+                SourceRef = sourceRef,
+                SourceLn = sourceLn,
+                SourceText = sourceText
+            });
+
+            _result.Add(new GLRecord
             {
-                throw new Exception(errorMessage);
-            }
+                Date = date,
+                R = r,
+                Num = num,
+                Text = text,
+                Amount = -amount,
+                Commodity = comm,
+                AmountDC = -amountdc,
+                AccountId = offset.AccountId,
+                AccountName = offset.Name,
+                AccountName1 = offset.Name1,
+                AccountName2 = offset.Name2,
+                AccountName3 = offset.Name3,
+                AccountName4 = offset.Name4,
+                AccountType = offset.Type,
+                OffsetAccountId = account.AccountId,
+                OffsetAccountName = account.Name,
+                Tag = tag,
+                Project = project,
+                SourceRef = sourceRef,
+                SourceLn = sourceLn,
+                SourceText = sourceText
+            });
         }
+
 
         private (decimal amount, decimal amountbc) UpdateBalanceTable(string accountId, string commodity, decimal amount, decimal amountbc)
         {
@@ -350,6 +291,18 @@ namespace SpreadsheetLedger.Core.Commands
                     return true;
                 default:
                     throw new Exception($"Account '{account.AccountId}' has unsupported type: '{account.Type}'. Supported: 'A' (Assets), 'L' (Liabilities) and 'E' (Equity).");
+            }
+        }
+
+        private static T TryExecute<T>(Func<T> action, string errorMessage)
+        {
+            try
+            {
+                return action();
+            }
+            catch
+            {
+                throw new Exception(errorMessage);
             }
         }
     }

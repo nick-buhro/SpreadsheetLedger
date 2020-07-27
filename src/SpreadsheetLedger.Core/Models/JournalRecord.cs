@@ -11,7 +11,7 @@ namespace SpreadsheetLedger.Core.Models
 
         public string Num { get; private set; }
 
-        public string Description { get; private set; }
+        public string Text { get; private set; }
                 
         public decimal? Amount { get; private set; }
 
@@ -24,11 +24,11 @@ namespace SpreadsheetLedger.Core.Models
         [Name("Account Id")]
         public string AccountId { get; private set; }
 
-        [Name("P/L Category Id")]
-        public string PLCategoryId { get; private set; }
+        [Name("Offset Account Id")]
+        public string OffsetAccountId { get; private set; }
 
-        [Name("P/L Tag")]
-        public string PLTag { get; private set; }
+        [Name("Tag")]
+        public string Tag { get; private set; }
 
         [Name("Source Ref")]
         public string SourceRef { get; private set; }
@@ -36,13 +36,13 @@ namespace SpreadsheetLedger.Core.Models
         [Name("Source Ln")]
         public string SourceLn { get; private set; }
 
-        [Name("Source Memo")]
-        public string SourceMemo { get; private set; }
+        [Name("Source Text")]
+        public string SourceText { get; private set; }
 
 
         public override string ToString()
         {
-            return $"{Date:d} {R} {Num} {Description}\t {Amount,6}{ToBalance,6} {Commodity} [{AccountId} <= {PLCategoryId}]";
+            return $"{Date:d} {R} {Num} {Text}\t {Amount,6}{ToBalance,6} {Commodity} [{AccountId} <= {OffsetAccountId}]";
         }
     }
 }
