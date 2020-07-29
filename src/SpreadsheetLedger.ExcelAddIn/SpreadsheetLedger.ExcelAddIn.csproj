@@ -156,11 +156,11 @@
     can be found.
   -->
   <ItemGroup>
-    <Compile Include="IO\Context.cs" />
-    <Compile Include="IO\RecordService.cs" />
+    <Compile Include="ListObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WorkbookExtensions.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -1,9 +1,10 @@
 ﻿using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
-using SpreadsheetLedger.Core.Commands;
-using SpreadsheetLedger.ExcelAddIn.IO;
+using SpreadsheetLedger.Core;
+using SpreadsheetLedger.Core.Models;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Forms = System.Windows.Forms;
@@ -34,7 +35,7 @@ namespace SpreadsheetLedger.ExcelAddIn
     {
         private IRibbonUI _ribbon;
 
-        public SpreadsheetLedgerRibbon() { }
+        //public SpreadsheetLedgerRibbon() { }
         
         #region IRibbonExtensibility Members
 
@@ -53,23 +54,65 @@ namespace SpreadsheetLedger.ExcelAddIn
             _ribbon = ribbonUI;            
         }
 
-        public void OnRefreshGL(IRibbonControl control)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+        public void OnPriceImport(IRibbonControl control)
         {
-            try
+            ExecuteCommand((wb) =>
             {
-                var context = new Context();
-                var command = new GLRefreshCommand(context);
-                command.Execute();
-            }
-            catch (Exception ex)
+               
+            });
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+        public void OnGLRefresh(IRibbonControl control)
+        {
+            ExecuteCommand((wb) =>
             {
-                Forms.MessageBox.Show(ex.ToString());
-            }
+                var coa = wb.FindListObject("CoA")
+                    .Read<AccountRecord>()
+                    .Where(a => !string.IsNullOrEmpty(a.AccountId))
+                    .ToDictionary(a => a.AccountId);
+
+                var prices = wb.FindListObject("Price")
+                    .Read<PriceRecord>();
+
+                var pl = new Pricelist("USD", prices);
+
+                var journal = wb.FindListObject("Journal")
+                    .Read<JournalRecord>()
+                    .Where(j => j.Date.HasValue)
+                    .OrderBy(j => j.Date.Value)
+                    .ThenBy(j => j.ToBalance.HasValue);
+
+                var gl = GL.Build(journal, coa, pl);
+
+                wb.FindListObject("GL")
+                    .Write(gl, true);
+
+                wb.RefreshAll();
+            });
         }
 
         #endregion
 
         #region Helpers
+
+        private static void ExecuteCommand(Action<Workbook> action)
+        {
+            try
+            {
+                Globals.ThisAddIn.Application.ScreenUpdating = false;
+                action(Globals.ThisAddIn.Application.ActiveWorkbook);
+            }
+            catch(Exception ex)
+            {
+                Forms.MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                Globals.ThisAddIn.Application.ScreenUpdating = true;
+            }
+        }
 
         private static string GetResourceText(string resourceName)
         {

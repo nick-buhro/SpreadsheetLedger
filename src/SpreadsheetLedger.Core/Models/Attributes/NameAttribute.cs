@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace SpreadsheetLedger.Core.Attributes
+namespace SpreadsheetLedger.Core.Models.Attributes
 {
     [AttributeUsage(
-        AttributeTargets.Property | AttributeTargets.Class,
+        AttributeTargets.Property,
         AllowMultiple = false)]
     internal sealed class NameAttribute : Attribute
     {

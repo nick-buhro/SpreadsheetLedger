@@ -4,17 +4,27 @@
     <tabs>
       <tab idMso="TabAddIns"
            label="Ledger">
-        
-        <group id="groupGL"
+
+        <group id="PriceGroup"
+               label="Price">
+
+          <button id="ImportPriceButton"
+                  label="Import"
+                  onAction="OnPriceImport"
+                  supertip="Import new prices."/>
+
+        </group>
+
+        <group id="GLGroup"
                label="GL">
           
-          <button id="btnRefreshGL"
-                  label="Rebuild GL"                  
-                  onAction="OnRefreshGL"
+          <button id="RefreshGLGroup"
+                  label="Refresh"
+                  onAction="OnGLRefresh"
                   supertip="Rebuild all general ledger (GL) table."/>
           
-        </group>
-        
+        </group>        
+
       </tab>
     </tabs>
   </ribbon>

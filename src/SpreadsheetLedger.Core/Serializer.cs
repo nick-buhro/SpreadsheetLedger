@@ -1,4 +1,4 @@
-﻿using SpreadsheetLedger.Core.Attributes;
+﻿using SpreadsheetLedger.Core.Models.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SpreadsheetLedger.Core.Helpers
 {
-    public static class RecordHelper
+    public static class Serializer
     {
         public static void Write<T>(object[,] header, object[,] data, IList<T> source)
         {

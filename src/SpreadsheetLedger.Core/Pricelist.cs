@@ -4,18 +4,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SpreadsheetLedger.Core.Helpers
+namespace SpreadsheetLedger.Core
 {
-    internal sealed class Pricelist
+    public sealed class Pricelist
     {
-        private readonly string _baseCommodity;
         private readonly Dictionary<string, List<PriceRecord>> _index;
 
-        public Pricelist(string baseCommodity, IList<PriceRecord> prices = null)
+        public string BaseCommodity { get; }
+
+        public Pricelist(string baseCommodity, IEnumerable<PriceRecord> prices)
         {
             Trace.Assert(!string.IsNullOrEmpty(baseCommodity));
-            _baseCommodity = baseCommodity;
-            _index = (prices ?? new PriceRecord[0])
+            Trace.Assert(prices != null);
+            BaseCommodity = baseCommodity;
+            _index = prices
                 .Where(p => p.Date.HasValue && !string.IsNullOrEmpty(p.Commodity) && p.Price.HasValue)
                 .GroupBy(p => p.Commodity)
                 .ToDictionary(
@@ -32,10 +34,10 @@ namespace SpreadsheetLedger.Core.Helpers
         public decimal CalculateAmountBC(DateTime date, decimal amount, string commodity)
         {
             if (amount == 0) return 0;
-            if (commodity == _baseCommodity) return amount;
+            if (commodity == BaseCommodity) return amount;
 
             var price = GetPrice(date, commodity);
-            return Math.Round(amount * price, 2);                       
+            return Math.Round(amount * price, 2);
         }
 
         private decimal GetPrice(DateTime date, string commodity)

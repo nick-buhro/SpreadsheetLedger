@@ -1,4 +1,4 @@
-﻿using SpreadsheetLedger.Core.Attributes;
+﻿using SpreadsheetLedger.Core.Models.Attributes;
 using System;
 
 namespace SpreadsheetLedger.Core.Models
