@@ -59,7 +59,24 @@ namespace SpreadsheetLedger.ExcelAddIn
         {
             ExecuteCommand((wb) =>
             {
-               
+                var conf = wb.FindListObject("Configuration")
+                     .Read<ConfigurationRecord>()
+                     .Where(r => !string.IsNullOrEmpty(r.Key))
+                     .ToDictionary(r => r.Key, r => r.Value);
+                
+                var prices = wb.FindListObject("Price")
+                    .Read<PriceRecord>();
+
+                var newPrices = PriceProvider.Load(conf, prices);
+
+                if (newPrices.Count > 0)
+                {
+                    wb.FindListObject("Price")
+                        .Write(newPrices);
+
+                    wb.FindListObject("Price")
+                        .Sort.Apply();
+                }
             });
         }
 
