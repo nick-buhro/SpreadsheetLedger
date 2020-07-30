@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SpreadsheetLedger.Core.Logic
+namespace SpreadsheetLedger.Core
 {
-    public sealed class LedgerException: Exception
+    public sealed class LedgerException : Exception
     {
         public LedgerException(string message)
             : base(message) { }

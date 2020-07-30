@@ -1,6 +1,6 @@
 ﻿using Microsoft.Office.Interop.Excel;
+using SpreadsheetLedger.Core;
 using SpreadsheetLedger.Core.Helpers;
-using SpreadsheetLedger.Core.Logic;
 using System.Collections.Generic;
 
 namespace SpreadsheetLedger.ExcelAddIn

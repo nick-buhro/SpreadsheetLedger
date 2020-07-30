@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.Core", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.ExcelAddIn", "src\SpreadsheetLedger.ExcelAddIn\SpreadsheetLedger.ExcelAddIn.csproj", "{69675415-5E7A-4EF6-BA83-3C64FF82718B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.CoreTests", "SpreadsheetLedger.CoreTests\SpreadsheetLedger.CoreTests.csproj", "{14FB3176-10DB-4E83-920D-61E7BD5F625E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{69675415-5E7A-4EF6-BA83-3C64FF82718B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69675415-5E7A-4EF6-BA83-3C64FF82718B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69675415-5E7A-4EF6-BA83-3C64FF82718B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14FB3176-10DB-4E83-920D-61E7BD5F625E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14FB3176-10DB-4E83-920D-61E7BD5F625E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14FB3176-10DB-4E83-920D-61E7BD5F625E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14FB3176-10DB-4E83-920D-61E7BD5F625E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

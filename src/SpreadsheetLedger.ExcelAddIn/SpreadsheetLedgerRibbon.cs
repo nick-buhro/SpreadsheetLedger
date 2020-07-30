@@ -68,6 +68,14 @@ namespace SpreadsheetLedger.ExcelAddIn
         {
             ExecuteCommand((wb) =>
             {
+                var conf = wb.FindListObject("Configuration")
+                    .Read<ConfigurationRecord>()
+                    .Where(r => !string.IsNullOrEmpty(r.Key))
+                    .ToDictionary(r => r.Key, r => r.Value);
+
+                if (!conf.TryGetValue(ConfigurationRecord.KEY_BASE_CURRENCY, out string baseCurrency))
+                    throw new LedgerException($"'{ConfigurationRecord.KEY_BASE_CURRENCY}' configuration not found.");
+
                 var coa = wb.FindListObject("CoA")
                     .Read<AccountRecord>()
                     .Where(a => !string.IsNullOrEmpty(a.AccountId))
@@ -76,7 +84,7 @@ namespace SpreadsheetLedger.ExcelAddIn
                 var prices = wb.FindListObject("Price")
                     .Read<PriceRecord>();
 
-                var pl = new Pricelist("USD", prices);
+                var pl = new CurrencyConverter(baseCurrency, prices);
 
                 var journal = wb.FindListObject("Journal")
                     .Read<JournalRecord>()

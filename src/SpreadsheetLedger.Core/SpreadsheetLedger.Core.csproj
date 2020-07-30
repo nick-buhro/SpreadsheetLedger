@@ -44,11 +44,15 @@
     <Compile Include="GL.cs" />
     <Compile Include="LedgerException.cs" />
     <Compile Include="Models\Attributes\NameAttribute.cs" />
-    <Compile Include="Pricelist.cs" />
+    <Compile Include="Models\ConfigurationRecord.cs" />
+    <Compile Include="Models\CurrencyRecord.cs" />
+    <Compile Include="CurrencyConverter.cs" />
     <Compile Include="Models\GLRecord.cs" />
     <Compile Include="Models\AccountRecord.cs" />
     <Compile Include="Models\JournalRecord.cs" />
     <Compile Include="Models\PriceRecord.cs" />
+    <Compile Include="PriceProvider.AlphaVantage.cs" />
+    <Compile Include="PriceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializer.cs" />
   </ItemGroup>

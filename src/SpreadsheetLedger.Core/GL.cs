@@ -1,5 +1,4 @@
-﻿using SpreadsheetLedger.Core.Logic;
-using SpreadsheetLedger.Core.Models;
+﻿using SpreadsheetLedger.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +9,7 @@ namespace SpreadsheetLedger.Core
     public static class GL
     {
         private static IDictionary<string, AccountRecord> _coa;
-        private static Pricelist _pl;
+        private static CurrencyConverter _pl;
         private static List<JournalRecord> _journal;
         private static List<GLRecord> _result;
 
@@ -24,7 +23,7 @@ namespace SpreadsheetLedger.Core
         public static List<GLRecord> Build(
             IEnumerable<JournalRecord> journal,
             Dictionary<string, AccountRecord> accountIndex,
-            Pricelist pricelist)
+            CurrencyConverter pricelist)
         {
             Trace.Assert(_coa == null);
             Trace.Assert(_pl == null);

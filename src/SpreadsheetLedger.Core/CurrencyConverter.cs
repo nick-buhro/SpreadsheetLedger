@@ -6,20 +6,20 @@ using System.Linq;
 
 namespace SpreadsheetLedger.Core
 {
-    public sealed class Pricelist
+    public sealed class CurrencyConverter
     {
         private readonly Dictionary<string, List<PriceRecord>> _index;
 
         public string BaseCommodity { get; }
 
-        public Pricelist(string baseCommodity, IEnumerable<PriceRecord> prices)
+        public CurrencyConverter(string baseCommodity, IEnumerable<PriceRecord> prices)
         {
             Trace.Assert(!string.IsNullOrEmpty(baseCommodity));
             Trace.Assert(prices != null);
             BaseCommodity = baseCommodity;
             _index = prices
-                .Where(p => p.Date.HasValue && !string.IsNullOrEmpty(p.Commodity) && p.Price.HasValue)
-                .GroupBy(p => p.Commodity)
+                .Where(p => p.Date.HasValue && !string.IsNullOrEmpty(p.Symbol) && p.Price.HasValue)
+                .GroupBy(p => p.Symbol)
                 .ToDictionary(
                     g => g.Key,
                     g => g.OrderBy(p => p.Date).ToList());
