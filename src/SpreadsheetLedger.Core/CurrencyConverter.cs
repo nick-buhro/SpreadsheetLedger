@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SpreadsheetLedger.Core
 {
-    public sealed class CurrencyConverter
+    public sealed class CurrencyConverter: ICurrencyConverter
     {
         private readonly Dictionary<string, List<PriceRecord>> _index;
 
@@ -25,13 +25,8 @@ namespace SpreadsheetLedger.Core
                     g => g.OrderBy(p => p.Date).ToList());
         }
 
-        public void Add(PriceRecord price)
-        {
-            throw new NotImplementedException();
-        }
 
-
-        public decimal CalculateAmountBC(DateTime date, decimal amount, string commodity)
+        public decimal Convert(DateTime date, decimal amount, string commodity)
         {
             if (amount == 0) return 0;
             if (commodity == BaseCommodity) return amount;

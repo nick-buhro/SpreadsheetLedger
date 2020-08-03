@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurrencyConverterV2Tests.cs" />
     <Compile Include="PriceProviderAlphaVantageTests.cs" />
     <Compile Include="PriceProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

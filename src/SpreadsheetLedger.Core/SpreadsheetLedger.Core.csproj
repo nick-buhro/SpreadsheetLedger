@@ -41,7 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurrencyConverterV2.cs" />
     <Compile Include="GL.cs" />
+    <Compile Include="ICurrencyConverter.cs" />
     <Compile Include="LedgerException.cs" />
     <Compile Include="Models\Attributes\NameAttribute.cs" />
     <Compile Include="Models\ConfigurationRecord.cs" />

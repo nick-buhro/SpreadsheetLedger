@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Threading;
 
 namespace SpreadsheetLedger.Core
 {
@@ -43,10 +44,20 @@ namespace SpreadsheetLedger.Core
 
                 //try
                 {
-                    var csv = GetResponseText(url);
-                    if (!csv.StartsWith("timestamp,open,high,low,close"))
-                        throw new LedgerException("Unexpected server response.");
+                    string csv = null;
+                    var tryCounter = 3;
+                    while (tryCounter > 0)
+                    {                        
+                        csv = GetResponseText(url);
+                        if (csv.StartsWith("timestamp,open,high,low,close"))
+                            break;
 
+                        if (--tryCounter == 0)
+                            throw new LedgerException(csv);
+
+                        Thread.Sleep(60000);
+                    }
+                                        
                     var lines = csv.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     for (var i = 1; i < lines.Length; i++)
                     {

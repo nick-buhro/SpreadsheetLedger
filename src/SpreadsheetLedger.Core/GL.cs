@@ -9,7 +9,7 @@ namespace SpreadsheetLedger.Core
     public static class GL
     {
         private static IDictionary<string, AccountRecord> _coa;
-        private static CurrencyConverter _pl;
+        private static ICurrencyConverter _converter;
         private static List<JournalRecord> _journal;
         private static List<GLRecord> _result;
 
@@ -19,26 +19,26 @@ namespace SpreadsheetLedger.Core
 
         /// <param name="journal">Filtered and ordered journal records.</param>
         /// <param name="accountIndex">CoA indexed by AccountId.</param>
-        /// <param name="pricelist">Actual pricelist object.</param>        
+        /// <param name="currencyConverter">Actual pricelist object.</param>        
         public static List<GLRecord> Build(
             IEnumerable<JournalRecord> journal,
             Dictionary<string, AccountRecord> accountIndex,
-            CurrencyConverter pricelist)
+            ICurrencyConverter currencyConverter)
         {
             Trace.Assert(_coa == null);
-            Trace.Assert(_pl == null);
+            Trace.Assert(_converter == null);
             Trace.Assert(_journal == null);
             Trace.Assert(_result == null);
             Trace.Assert(_runningBalance == null);
 
             Trace.Assert(journal != null);
             Trace.Assert(accountIndex != null);
-            Trace.Assert(pricelist != null);
+            Trace.Assert(currencyConverter != null);
 
             try
             {
                 _coa = accountIndex;
-                _pl = pricelist;
+                _converter = currencyConverter;
                 _journal = journal.ToList();
                 _result = new List<GLRecord>();                
 
@@ -64,7 +64,7 @@ namespace SpreadsheetLedger.Core
             finally
             {
                 _coa = null;
-                _pl = null;
+                _converter = null;
                 _journal = null;
                 _result = null;
                 _journalNextIndex = 0;
@@ -105,7 +105,7 @@ namespace SpreadsheetLedger.Core
                     }
 
                     if (amount == 0) continue;
-                    var amountbc = _pl.CalculateAmountBC(dt, amount, j.Commodity);
+                    var amountbc = _converter.Convert(dt, amount, j.Commodity);
 
                     // Find accounts
 
@@ -153,7 +153,7 @@ namespace SpreadsheetLedger.Core
             {
                 try
                 {
-                    if (key.comm == _pl.BaseCommodity) continue;
+                    // if (key.comm == _converter.BaseCommodity) continue;
 
                     var account = _coa[key.account];
                     if (IsEquityAccount(account)) continue;
@@ -161,7 +161,7 @@ namespace SpreadsheetLedger.Core
                     // Calculate correction
 
                     var balance = _runningBalance[key];
-                    var correction = _pl.CalculateAmountBC(dt, balance.amount, key.comm) - balance.amountbc;
+                    var correction = _converter.Convert(dt, balance.amount, key.comm) - balance.amountbc;
                     if (correction == 0) continue;
 
                     // Find revaluation account

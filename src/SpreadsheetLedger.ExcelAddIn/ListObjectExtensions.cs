@@ -10,6 +10,9 @@ namespace SpreadsheetLedger.ExcelAddIn
         public static T[] Read<T>(this ListObject lo)
             where T: new()
         {
+            if (lo.DataBodyRange == null)
+                return new T[0];
+
             return Serializer.Read<T>(
                 lo.HeaderRowRange.Value,
                 lo.DataBodyRange.Value);
