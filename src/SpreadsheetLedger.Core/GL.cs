@@ -48,7 +48,9 @@ namespace SpreadsheetLedger.Core
                     _runningBalance = new Dictionary<(string account, string comm), (decimal amount, decimal amountbc)>();
 
                     var minDate = _journal[0].Date.Value;
-                    var maxDate = _journal[_journal.Count - 1].Date.Value;
+                    var maxDate = _journal[_journal.Count - 1].Date.Value;                    
+                    if (maxDate < DateTime.Today)
+                        maxDate = DateTime.Today;
                     maxDate = maxDate.AddMonths(1);
                     maxDate = new DateTime(maxDate.Year, maxDate.Month, 1);
 
@@ -160,8 +162,11 @@ namespace SpreadsheetLedger.Core
                     // Calculate correction
 
                     var balance = _runningBalance[key];
-                    var correction = _converter.Convert(dt, balance.amount, key.comm) - balance.amountbc;
+                    var newBalance = _converter.Convert(dt, balance.amount, key.comm);
+                    var correction = newBalance - balance.amountbc;
                     if (correction == 0) continue;
+
+                    var text = $"{balance.amount} {key.comm}: {balance.amountbc} => {newBalance}";
 
                     // Find revaluation account
 
@@ -185,9 +190,9 @@ namespace SpreadsheetLedger.Core
                         project = revaluationAccount.Project;
                     }
 
-                    // Add GL record                    
+                    // Add GL record
 
-                    AddGLTransaction(dt, "r", null, null, null, key.comm, correction, account, revaluationAccount, null, project, null);
+                    AddGLTransaction(dt, "r", null, text, null, key.comm, correction, account, revaluationAccount, null, project, null);
                 }
                 catch (Exception ex)
                 {
