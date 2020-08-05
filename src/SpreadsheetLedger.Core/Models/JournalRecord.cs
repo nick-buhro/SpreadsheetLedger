@@ -12,6 +12,9 @@ namespace SpreadsheetLedger.Core.Models
         public string Num { get; private set; }
 
         public string Text { get; private set; }
+
+        [Name("Doc Text")]
+        public string DocText { get; private set; }
                 
         public decimal? Amount { get; private set; }
 
@@ -29,15 +32,6 @@ namespace SpreadsheetLedger.Core.Models
 
         [Name("Tag")]
         public string Tag { get; private set; }
-
-        [Name("Source Ref")]
-        public string SourceRef { get; private set; }
-
-        [Name("Source Ln")]
-        public string SourceLn { get; private set; }
-
-        [Name("Source Text")]
-        public string SourceText { get; private set; }
 
 
         public override string ToString()

@@ -134,8 +134,7 @@ namespace SpreadsheetLedger.Core
                     AddGLTransaction(
                         dt, j.R, j.Num, j.Text, amount, j.Commodity, amountbc,
                         account, offsetAccount,
-                        j.Tag, project,
-                        j.SourceRef, j.SourceLn, j.SourceText);
+                        j.Tag, project, j.DocText);
                 }
                 catch (Exception ex)
                 {
@@ -188,7 +187,7 @@ namespace SpreadsheetLedger.Core
 
                     // Add GL record                    
 
-                    AddGLTransaction(dt, "r", null, null, null, key.comm, correction, account, revaluationAccount, null, project, null, null, null);
+                    AddGLTransaction(dt, "r", null, null, null, key.comm, correction, account, revaluationAccount, null, project, null);
                 }
                 catch (Exception ex)
                 {
@@ -200,7 +199,7 @@ namespace SpreadsheetLedger.Core
         private static void AddGLTransaction(
             DateTime date, string r, string num, string text, decimal? amount, string comm, decimal amountdc,
             AccountRecord account, AccountRecord offset,
-            string tag, string project, string sourceRef, string sourceLn, string sourceText)
+            string tag, string project, string docText)
         {
             UpdateBalanceTable(account.AccountId, comm, amount ?? 0, amountdc);
             UpdateBalanceTable(offset.AccountId, comm, -amount ?? 0, -amountdc);
@@ -225,9 +224,7 @@ namespace SpreadsheetLedger.Core
                 OffsetAccountName = offset.Name,
                 Tag = tag,
                 Project = project,
-                SourceRef = sourceRef,
-                SourceLn = sourceLn,
-                SourceText = sourceText
+                DocText = docText
             });
 
             _result.Add(new GLRecord
@@ -250,9 +247,7 @@ namespace SpreadsheetLedger.Core
                 OffsetAccountName = account.Name,
                 Tag = tag,
                 Project = project,
-                SourceRef = sourceRef,
-                SourceLn = sourceLn,
-                SourceText = sourceText
+                DocText = docText
             });
         }
 

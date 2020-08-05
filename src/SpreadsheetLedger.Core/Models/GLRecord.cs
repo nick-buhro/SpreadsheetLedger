@@ -13,6 +13,9 @@ namespace SpreadsheetLedger.Core.Models
 
         public string Text { get; set; }
 
+        [Name("Doc Text")]
+        public string DocText { get; set; }
+
         public decimal? Amount { get; set; }
                 
         [Name("Comm")]
@@ -51,15 +54,5 @@ namespace SpreadsheetLedger.Core.Models
         public string Tag { get; set; }
 
         public string Project { get; set; }
-                
-
-        [Name("Source Ref")]
-        public string SourceRef { get; set; }
-
-        [Name("Source Ln")]
-        public string SourceLn { get; set; }
-
-        [Name("Source Text")]
-        public string SourceText { get; set; }
     }
 }
