@@ -25,6 +25,9 @@ namespace SpreadsheetLedger.Core.Models
 
         [Name("Revaluation Account Id")]
         public string RevaluationAccountId { get; private set; }
+
+        [Name("Settlement Account Id")]
+        public string SettlementAccountId { get; private set; }
                 
         public string Project { get; private set; }
 

@@ -62,5 +62,10 @@ namespace SpreadsheetLedger.Core
                 throw new Exception($"'{commodity}' prices not found.");
             }
         }
+
+        public decimal Round(decimal amount, string symbol = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

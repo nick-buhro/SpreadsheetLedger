@@ -98,10 +98,9 @@ namespace SpreadsheetLedger.Core
                         throw new InvalidOperationException();
                 }
             }
-            return Math.Round(result, 4);
+            return Round(result, null);
         }
 
-
-
+        public decimal Round(decimal amount, string symbol) => Math.Round(amount, 4);
     }
 }
