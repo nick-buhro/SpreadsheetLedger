@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SpreadsheetLedger.Core
+namespace SpreadsheetLedger.Core.Impl
 {
-    public sealed class CurrencyConverterV2: ICurrencyConverter
+    public sealed class CurrencyConverter : ICurrencyConverter
     {
         private Dictionary<string, (char op, string source)[]> _currencyRules;
         private Dictionary<string, List<PriceRecord>> _priceIndex;
 
 
-        public CurrencyConverterV2(
+        public CurrencyConverter(
             IEnumerable<CurrencyRecord> currencies,
             IEnumerable<PriceRecord> prices)
         {
@@ -49,8 +49,11 @@ namespace SpreadsheetLedger.Core
             return result;
         }
 
-        public decimal Convert(DateTime date, decimal amount, string symbol)
+        public decimal Convert(decimal amount, string symbol, DateTime date, string currency)
         {
+            if (currency != null)
+                throw new NotImplementedException("Convertation to specific currency is not implemented yet.");
+
             if (!_currencyRules.TryGetValue(symbol, out var rules))
                 throw new LedgerException($"Can't find currency convertation rules for '{symbol}'.");
 

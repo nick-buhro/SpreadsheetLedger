@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SpreadsheetLedger.Core.Helpers
+namespace SpreadsheetLedger.Core.Impl
 {
-    public static class Serializer
+    public sealed class Serializer : ISerializer
     {
-        public static void Write<T>(object[,] header, object[,] data, IList<T> source)
+        public void Write<T>(object[,] header, object[,] data, IList<T> source)
         {
             Trace.Assert(header != null);
             Trace.Assert(header.GetLength(0) == 1);
             Trace.Assert(data != null);
             Trace.Assert(data.GetLength(0) == source.Count);
 
-            if ((source == null) || (source.Count == 0))
+            if (source == null || source.Count == 0)
                 return;
 
             var index = Enumerable
@@ -41,7 +41,7 @@ namespace SpreadsheetLedger.Core.Helpers
             }
         }
 
-        public static T[] Read<T>(object[,] header, object[,] data)
+        public T[] Read<T>(object[,] header, object[,] data)
             where T : new()
         {
             Trace.Assert(header != null);
@@ -65,10 +65,10 @@ namespace SpreadsheetLedger.Core.Helpers
                     {
                         if (columnName == (string)header[h, c])
                         {
-                            if ((pi.PropertyType == typeof(decimal)) || (pi.PropertyType == typeof(decimal?)))
+                            if (pi.PropertyType == typeof(decimal) || pi.PropertyType == typeof(decimal?))
                             {
                                 var value = data[i + firstRowIndex, c];
-                                pi.SetValue(record, ToDecimal(value));                                
+                                pi.SetValue(record, ToDecimal(value));
                             }
                             else if (pi.PropertyType == typeof(string))
                             {
@@ -77,7 +77,7 @@ namespace SpreadsheetLedger.Core.Helpers
                             }
                             else
                             {
-                               pi.SetValue(record, data[i + firstRowIndex, c]);                               
+                                pi.SetValue(record, data[i + firstRowIndex, c]);
                             }
                             break;
                         }

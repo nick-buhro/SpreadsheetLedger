@@ -1,15 +1,15 @@
-﻿using SpreadsheetLedger.Core;
+﻿using SpreadsheetLedger.Core.Impl;
 using Xunit;
 
-namespace SpreadsheetLedger.CoreTests
+namespace SpreadsheetLedger.CoreTests.Impl
 {
-    public sealed class CurrencyConverterV2Tests
+    public sealed class CurrencyConverterTests
     {
         [Fact]
         public void ParseRuleTest0()
         {
             var input = @"";
-            var result = CurrencyConverterV2.ParseRule(input);
+            var result = CurrencyConverter.ParseRule(input);
             Assert.Empty(result);
         }
 
@@ -17,7 +17,7 @@ namespace SpreadsheetLedger.CoreTests
         public void ParseRuleTest1()
         {
             var input = @"* (EUR/USD:AV)";
-            var result = CurrencyConverterV2.ParseRule(input);
+            var result = CurrencyConverter.ParseRule(input);
 
             Assert.Single(result);
             Assert.Equal('*', result[0].op);
@@ -28,7 +28,7 @@ namespace SpreadsheetLedger.CoreTests
         public void ParseRuleTest2()
         {
             var input = @"* (MSFT/USD:AV) / ( EUR / USD : AV )";    // MSFT => USD => EUR
-            var result = CurrencyConverterV2.ParseRule(input);
+            var result = CurrencyConverter.ParseRule(input);
 
             Assert.Equal(2, result.Length);
             Assert.Equal('*', result[0].op);

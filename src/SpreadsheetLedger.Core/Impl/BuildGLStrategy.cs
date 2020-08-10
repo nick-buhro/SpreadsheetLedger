@@ -4,26 +4,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SpreadsheetLedger.Core
+namespace SpreadsheetLedger.Core.Impl
 {
-    public static class GL
+    public sealed class BuildGLStrategy : IBuildGLStrategy
     {
-        private static IDictionary<string, AccountRecord> _coa;
-        private static ICurrencyConverter _converter;
-        private static List<JournalRecord> _journal;
-        private static List<GLRecord> _result;
+        private Dictionary<string, AccountRecord> _coa;
+        private ICurrencyConverter _converter;
+        private List<JournalRecord> _journal;
+        private List<GLRecord> _result;
 
-        private static int _journalNextIndex;
-        private static Dictionary<(string account, string comm), (string comm, decimal amount, decimal amountbc)> _runningBalance;
+        private int _journalNextIndex;
+        private Dictionary<(string account, string comm), (string comm, decimal amount, decimal amountbc)> _runningBalance;
 
-
-        /// <param name="journal">Filtered and ordered journal records.</param>
-        /// <param name="accountIndex">CoA indexed by AccountId.</param>
-        /// <param name="currencyConverter">Actual pricelist object.</param>        
-        public static List<GLRecord> Build(
-            IEnumerable<JournalRecord> journal,
-            Dictionary<string, AccountRecord> accountIndex,
-            ICurrencyConverter currencyConverter)
+        public IList<GLRecord> Build(
+            IEnumerable<AccountRecord> accountRecords,
+            IEnumerable<JournalRecord> journalRecords,
+            IEnumerable<CurrencyRecord> currencyRecords,
+            IEnumerable<PriceRecord> priceRecords)
         {
             Trace.Assert(_coa == null);
             Trace.Assert(_converter == null);
@@ -31,24 +28,34 @@ namespace SpreadsheetLedger.Core
             Trace.Assert(_result == null);
             Trace.Assert(_runningBalance == null);
 
-            Trace.Assert(journal != null);
-            Trace.Assert(accountIndex != null);
-            Trace.Assert(currencyConverter != null);
+            Trace.Assert(accountRecords != null);
+            Trace.Assert(journalRecords != null);
+            Trace.Assert(currencyRecords != null);
+            Trace.Assert(priceRecords != null);
 
             try
             {
-                _coa = accountIndex;
-                _converter = currencyConverter;
-                _journal = journal.ToList();
-                _result = new List<GLRecord>();                
 
+                _coa = accountRecords
+                    .Where(a => !string.IsNullOrEmpty(a.AccountId))
+                    .ToDictionary(a => a.AccountId);
+
+                _converter = new CurrencyConverter(currencyRecords, priceRecords);
+
+                _journal = journalRecords
+                    .Where(j => j.Date.HasValue)
+                    .OrderBy(j => j.Date.Value)
+                    .ThenBy(j => j.ToBalance.HasValue)
+                    .ToList();
+
+                _result = new List<GLRecord>();
                 if (_journal.Count > 0)
                 {
                     _journalNextIndex = 0;
                     _runningBalance = new Dictionary<(string account, string comm), (string comm, decimal amount, decimal amountbc)>();
 
                     var minDate = _journal[0].Date.Value;
-                    var maxDate = _journal[_journal.Count - 1].Date.Value;                    
+                    var maxDate = _journal[_journal.Count - 1].Date.Value;
                     if (maxDate < DateTime.Today)
                         maxDate = DateTime.Today;
                     maxDate = maxDate.AddMonths(1);
@@ -61,7 +68,6 @@ namespace SpreadsheetLedger.Core
                         // AppendSettlements(dt);
                     }
                 }
-
                 return _result;
             }
             finally
@@ -75,7 +81,9 @@ namespace SpreadsheetLedger.Core
             }
         }
 
-        private static void AppendJournalRecords(DateTime dt)
+
+
+        private void AppendJournalRecords(DateTime dt)
         {
             var toBalanceSection = false;
             while (true)
@@ -108,7 +116,7 @@ namespace SpreadsheetLedger.Core
                     }
 
                     if (amount == 0) continue;
-                    var amountbc = _converter.Convert(dt, amount, j.Commodity);
+                    var amountbc = _converter.Convert(amount, j.Commodity, dt);
 
                     // Find accounts
 
@@ -146,14 +154,14 @@ namespace SpreadsheetLedger.Core
             }
         }
 
-        private static void AppendRevaluations(DateTime dt, string accountId = null)
+        private void AppendRevaluations(DateTime dt, string accountId = null)
         {
             // Revaluate all accounts only at the end of month
-            if ((accountId == null) && (dt.AddDays(1).Day != 1))
+            if (accountId == null && dt.AddDays(1).Day != 1)
                 return;
 
             var keys = _runningBalance.Keys
-                .Where(k => (accountId == null) || (k.account == accountId))
+                .Where(k => accountId == null || k.account == accountId)
                 .ToList();
 
             foreach (var key in keys)
@@ -168,7 +176,7 @@ namespace SpreadsheetLedger.Core
                     // Calculate correction
 
                     var balance = _runningBalance[key];
-                    var newBalance = _converter.Convert(dt, balance.amount, key.comm);
+                    var newBalance = _converter.Convert(balance.amount, key.comm, dt);
                     var correction = newBalance - balance.amountbc;
                     if (correction == 0) continue;
 
@@ -207,8 +215,8 @@ namespace SpreadsheetLedger.Core
             }
         }
 
-        public static void AppendSettlements(DateTime dt)
-        {            
+        public void AppendSettlements(DateTime dt)
+        {
             foreach (var account in _coa.Values.Where(a => !string.IsNullOrEmpty(a.SettlementAccountId)))
             {
                 // Find and validate accounts
@@ -263,11 +271,11 @@ namespace SpreadsheetLedger.Core
 
                 var debitbc = balances.Where(b => b.amountbc > 0).Sum(b => b.amountbc);
                 var creditbc = balances.Where(b => b.amountbc < 0).Sum(b => b.amountbc);
-                
+
                 if (debitbc > -creditbc)
                 {
-                    decimal unsettledbc = -creditbc;                    
-                    for (var i = 0; i < (balances.Count - 1); i++)
+                    decimal unsettledbc = -creditbc;
+                    for (var i = 0; i < balances.Count - 1; i++)
                     {
                         if (balances[i].amountbc > 0)
                         {
@@ -292,7 +300,7 @@ namespace SpreadsheetLedger.Core
                 else
                 {
                     decimal unsettledbc = -debitbc;
-                    for (var i = (balances.Count - 1); i > 0; i--)
+                    for (var i = balances.Count - 1; i > 0; i--)
                     {
                         if (balances[i].amountbc < 0)
                         {
@@ -319,14 +327,14 @@ namespace SpreadsheetLedger.Core
                 Trace.Assert(balances.Sum(b => b.amountbc) == 0);
 
                 var text = string.Join(" + ", balances.Select(b => $"{b.amount} {b.comm}").Reverse());
-                foreach(var b in balances)
+                foreach (var b in balances)
                 {
                     AddGLTransaction(dt, "s", null, text, -b.amount, b.comm, -b.amountbc, account, settlementAccount, null, project, null);
                 }
             }
         }
 
-        private static void AddGLTransaction(
+        private void AddGLTransaction(
             DateTime date, string r, string num, string text, decimal? amount, string comm, decimal amountdc,
             AccountRecord account, AccountRecord offset,
             string tag, string project, string docText)
@@ -382,7 +390,7 @@ namespace SpreadsheetLedger.Core
         }
 
 
-        private static (string comm, decimal amount, decimal amountbc) UpdateBalanceTable(string accountId, string commodity, decimal amount, decimal amountbc)
+        private (string comm, decimal amount, decimal amountbc) UpdateBalanceTable(string accountId, string commodity, decimal amount, decimal amountbc)
         {
             Trace.Assert(!string.IsNullOrWhiteSpace(accountId));
             Trace.Assert(!string.IsNullOrWhiteSpace(commodity));

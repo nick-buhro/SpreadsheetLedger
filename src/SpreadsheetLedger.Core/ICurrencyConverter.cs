@@ -4,8 +4,9 @@ namespace SpreadsheetLedger.Core
 {
     public interface ICurrencyConverter
     {
-        decimal Convert(DateTime date, decimal amount, string symbol);
+        decimal Convert(decimal amount, string symbol, DateTime date, string currency = null);
 
+        [Obsolete]
         decimal Round(decimal amount, string symbol = null);
     }
 }

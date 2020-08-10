@@ -1,21 +1,35 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using SpreadsheetLedger.Core;
-using SpreadsheetLedger.Core.Helpers;
+using SpreadsheetLedger.Core.Impl;
 using System.Collections.Generic;
 
 namespace SpreadsheetLedger.ExcelAddIn
 {
     public static class ListObjectExtensions
     {
+        private static readonly ISerializer _serializer = new Serializer();
+
         public static T[] Read<T>(this ListObject lo)
             where T: new()
         {
             if (lo.DataBodyRange == null)
                 return new T[0];
 
-            return Serializer.Read<T>(
+            return _serializer.Read<T>(
                 lo.HeaderRowRange.Value,
                 lo.DataBodyRange.Value);
+        }
+
+        public static IEnumerable<T> ReadLazy<T>(this ListObject lo)
+            where T: new()
+        {
+            if (lo.DataBodyRange == null)
+                return new T[0];
+
+            return new LazyRecordCollection<T>(
+                lo.HeaderRowRange.Value,
+                lo.DataBodyRange.Value,
+                _serializer);
         }
 
         public static void Write<T>(this ListObject lo, IList<T> data, bool overwrite = false)
@@ -47,7 +61,7 @@ namespace SpreadsheetLedger.ExcelAddIn
                         .Resize[data.Count, lo.DataBodyRange.Columns.Count];
 
                     var value = lo.DataBodyRange.Value;
-                    Serializer.Write(lo.HeaderRowRange.Value, value, data);
+                    _serializer.Write(lo.HeaderRowRange.Value, value, data);
                     newDataRange.Value = value;
                 }
             }
@@ -66,7 +80,7 @@ namespace SpreadsheetLedger.ExcelAddIn
                     .Resize[data.Count, lo.DataBodyRange.Columns.Count];
 
                 var value = appendRange.Value;
-                Serializer.Write(lo.HeaderRowRange.Value, value, data);
+                _serializer.Write(lo.HeaderRowRange.Value, value, data);
                 appendRange.Value = value;
             }
         }

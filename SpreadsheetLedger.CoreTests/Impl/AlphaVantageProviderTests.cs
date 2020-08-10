@@ -1,19 +1,17 @@
-﻿using SpreadsheetLedger.Core;
+﻿using SpreadsheetLedger.Core.Impl;
 using System;
 using System.Linq;
 using Xunit;
 
-namespace SpreadsheetLedger.CoreTests
+namespace SpreadsheetLedger.CoreTests.Impl
 {
-    public class PriceProviderAlphaVantageTests
+    public class AlphaVantageProviderTests
     {
         [Fact]
-        public void FX_MONTHLY_DEMO_1()
+        public async void FX_MONTHLY_DEMO_1()
         {
-            var avProvider = new PriceProvider.AlphaVantage("AV");
-            var actual = avProvider
-                .Load("EUR", "USD", new DateTime(2020, 01, 01), new[] { "FX_MONTHLY", "DEMO" })
-                .ToList();
+            var avProvider = new AlphaVantageProvider();
+            var actual = await avProvider.GetPrices("EUR", "USD", new DateTime(2020, 01, 01), new[] { "FX_MONTHLY", "DEMO" }, default);
 
             Assert.NotNull(actual);
 
@@ -28,12 +26,10 @@ namespace SpreadsheetLedger.CoreTests
         }
 
         [Fact]
-        public void TIME_SERIES_MONTHLY_DEMO_1()
+        public async void TIME_SERIES_MONTHLY_DEMO_1()
         {
-            var avProvider = new PriceProvider.AlphaVantage("AV");
-            var actual = avProvider
-                .Load("IBM", "USD", new DateTime(2020, 01, 01), new[] { "TIME_SERIES_MONTHLY", "DEMO" })
-                .ToList();
+            var avProvider = new AlphaVantageProvider();
+            var actual = await avProvider.GetPrices("IBM", "USD", new DateTime(2020, 01, 01), new[] { "TIME_SERIES_MONTHLY", "DEMO" }, default);
 
             Assert.NotNull(actual);
 

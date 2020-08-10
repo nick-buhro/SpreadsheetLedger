@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using SpreadsheetLedger.Core;
+using SpreadsheetLedger.Core.Impl;
 using SpreadsheetLedger.Core.Models;
 using System;
 using System.IO;
@@ -35,6 +36,9 @@ namespace SpreadsheetLedger.ExcelAddIn
     {
         private IRibbonUI _ribbon;
 
+        private IBuildGLStrategy _buildGLStrategy;
+        private IPriceImportStrategy _priceImportStrategy;
+
         //public SpreadsheetLedgerRibbon() { }
         
         #region IRibbonExtensibility Members
@@ -51,7 +55,10 @@ namespace SpreadsheetLedger.ExcelAddIn
 
         public void Ribbon_Load(IRibbonUI ribbonUI)
         {
-            _ribbon = ribbonUI;            
+            _ribbon = ribbonUI;
+
+            _buildGLStrategy = new BuildGLStrategy();
+            _priceImportStrategy = new PriceImportStrategy();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
@@ -67,15 +74,17 @@ namespace SpreadsheetLedger.ExcelAddIn
                 var prices = wb.FindListObject("Price")
                     .Read<PriceRecord>();
 
-                var newPrices = PriceProvider.Load(conf, prices);
-
+                var newPrices = _priceImportStrategy
+                    .Import(
+                        wb.FindListObject("Configuration").ReadLazy<ConfigurationRecord>(),
+                        wb.FindListObject("Price").ReadLazy<PriceRecord>())
+                    .Result;
+                
                 if (newPrices.Count > 0)
                 {
-                    wb.FindListObject("Price")
-                        .Write(newPrices);
-
-                    wb.FindListObject("Price")
-                        .Sort.Apply();
+                    var lo = wb.FindListObject("Price");
+                    lo.Write(newPrices);
+                    lo.Sort.Apply();
                 }
             });
         }
@@ -85,28 +94,11 @@ namespace SpreadsheetLedger.ExcelAddIn
         {
             ExecuteCommand((wb) =>
             {
-                var coa = wb.FindListObject("CoA")
-                    .Read<AccountRecord>()
-                    .Where(a => !string.IsNullOrEmpty(a.AccountId))
-                    .ToDictionary(a => a.AccountId);
-
-                var currencies = wb.FindListObject("Currency")
-                    .Read<CurrencyRecord>();
-
-                var prices = wb.FindListObject("Price")
-                    .Read<PriceRecord>();
-
-                var pl = new CurrencyConverterV2(
-                    currencies,
-                    prices);
-
-                var journal = wb.FindListObjects(n => n.EndsWith("Journal"))
-                    .SelectMany(lo => lo.Read<JournalRecord>())
-                    .Where(j => j.Date.HasValue)
-                    .OrderBy(j => j.Date.Value)
-                    .ThenBy(j => j.ToBalance.HasValue);
-
-                var gl = GL.Build(journal, coa, pl);
+                var gl = _buildGLStrategy.Build(
+                    wb.FindListObject("CoA").ReadLazy<AccountRecord>(),
+                    wb.FindListObject("Journal").ReadLazy<JournalRecord>(),
+                    wb.FindListObject("Currency").ReadLazy<CurrencyRecord>(),
+                    wb.FindListObject("Price").ReadLazy<PriceRecord>());
 
                 wb.FindListObject("GL")
                     .Write(gl, true);
