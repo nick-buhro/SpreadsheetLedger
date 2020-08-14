@@ -164,23 +164,6 @@
     </Compile>
     <Compile Include="LazyRecordCollection.cs" />
     <Compile Include="WorkbookExtensions.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="SpreadsheetLedgerRibbon.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
@@ -195,13 +178,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="SpreadsheetLedgerRibbon.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SpreadsheetLedger.Core\SpreadsheetLedger.Core.csproj">
       <Project>{11d5c726-af10-47ce-8453-af15fe9ccbac}</Project>
       <Name>SpreadsheetLedger.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SpreadsheetLedgerRibbon.xml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

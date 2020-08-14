@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.Core", "src\SpreadsheetLedger.Core\SpreadsheetLedger.Core.csproj", "{11D5C726-AF10-47CE-8453-AF15FE9CCBAC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.Core", "SpreadsheetLedger.Core\SpreadsheetLedger.Core.csproj", "{11D5C726-AF10-47CE-8453-AF15FE9CCBAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.ExcelAddIn", "src\SpreadsheetLedger.ExcelAddIn\SpreadsheetLedger.ExcelAddIn.csproj", "{69675415-5E7A-4EF6-BA83-3C64FF82718B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.ExcelAddIn", "SpreadsheetLedger.ExcelAddIn\SpreadsheetLedger.ExcelAddIn.csproj", "{69675415-5E7A-4EF6-BA83-3C64FF82718B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetLedger.CoreTests", "SpreadsheetLedger.CoreTests\SpreadsheetLedger.CoreTests.csproj", "{14FB3176-10DB-4E83-920D-61E7BD5F625E}"
 EndProject

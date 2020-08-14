@@ -65,7 +65,6 @@ namespace SpreadsheetLedger.Core.Impl
                     {
                         AppendJournalRecords(dt);
                         AppendRevaluations(dt);
-                        // AppendSettlements(dt);
                     }
                 }
                 return _result;
@@ -122,7 +121,7 @@ namespace SpreadsheetLedger.Core.Impl
 
                     if (!_coa.TryGetValue(j.AccountId, out AccountRecord account))
                         throw new LedgerException($"Account '{j.AccountId}' not found.");
-
+                    
                     if (!_coa.TryGetValue(j.OffsetAccountId, out AccountRecord offsetAccount))
                         throw new LedgerException($"Offset account '{j.OffsetAccountId}' not found.");
 
@@ -211,125 +210,6 @@ namespace SpreadsheetLedger.Core.Impl
                 catch (Exception ex)
                 {
                     throw new LedgerException($"Revaluation error for '{key.account}' {key.comm} on {dt.ToShortDateString()}.", ex);
-                }
-            }
-        }
-
-        public void AppendSettlements(DateTime dt)
-        {
-            foreach (var account in _coa.Values.Where(a => !string.IsNullOrEmpty(a.SettlementAccountId)))
-            {
-                // Find and validate accounts
-
-                if (IsEquityAccount(account))
-                    throw new LedgerException($"Equity account settlement is not supported ('{account.AccountId}'). Remove 'Settlement Account Id' configuration.");
-
-                if (!_coa.TryGetValue(account.SettlementAccountId, out var settlementAccount))
-                    throw new LedgerException($"Settlement account '{account.SettlementAccountId}' for '{account.AccountId}' not found.");
-
-                if (!IsEquityAccount(settlementAccount))
-                    throw new LedgerException($"Settlement account '{account.SettlementAccountId}' for '{account.AccountId}' should be Equity type.");
-
-                // Check if settlement possible
-
-                var rank = _runningBalance.Keys
-                    .Where(k => k.account == account.AccountId)
-                    .Select(k => Math.Sign(_runningBalance[k].amount))
-                    .Where(v => v != 0)
-                    .Distinct()
-                    .Count();
-
-                if (rank < 2)
-                    continue;
-
-                // Validate project
-
-                string project = null;
-                if (!string.IsNullOrEmpty(account.Project))
-                {
-                    project = account.Project;
-                    if (!string.IsNullOrEmpty(settlementAccount.Project) && settlementAccount.Project != project)
-                        throw new Exception($"'{account.AccountId} account project doesn't equal to '{settlementAccount.AccountId}' settlement account project.");
-                }
-                else if (!string.IsNullOrEmpty(settlementAccount.Project))
-                {
-                    project = settlementAccount.Project;
-                }
-
-                // Revaluate accounts before settlement
-
-                AppendRevaluations(dt, account.AccountId);
-
-                // Calculate settlement amounts
-
-                var balances = _runningBalance.Keys
-                    .Where(k => k.account == account.AccountId)
-                    .Select(k => _runningBalance[k])
-                    .Where(v => v.amountbc != 0)
-                    .OrderBy(v => v.amountbc)
-                    .ToList();
-
-                var debitbc = balances.Where(b => b.amountbc > 0).Sum(b => b.amountbc);
-                var creditbc = balances.Where(b => b.amountbc < 0).Sum(b => b.amountbc);
-
-                if (debitbc > -creditbc)
-                {
-                    decimal unsettledbc = -creditbc;
-                    for (var i = 0; i < balances.Count - 1; i++)
-                    {
-                        if (balances[i].amountbc > 0)
-                        {
-                            var comm = balances[i].comm;
-                            var amountbc = _converter.Round(-balances[i].amountbc * creditbc / debitbc);
-                            var amount = _converter.Round(balances[i].amount * amountbc / balances[i].amountbc);
-                            unsettledbc -= amountbc;
-                            balances[i] = (comm, amount, amountbc);
-                        }
-                    }
-                    var lastIndex = balances.Count - 1;
-                    Trace.Assert(balances[lastIndex].amount > 0);
-                    Trace.Assert(balances[lastIndex].amountbc > 0);
-                    Trace.Assert(unsettledbc > 0);
-                    {
-                        var comm = balances[lastIndex].comm;
-                        var amountbc = unsettledbc;
-                        var amount = _converter.Round(balances[lastIndex].amount * amountbc / balances[lastIndex].amountbc);
-                        balances[lastIndex] = (comm, amount, amountbc);
-                    }
-                }
-                else
-                {
-                    decimal unsettledbc = -debitbc;
-                    for (var i = balances.Count - 1; i > 0; i--)
-                    {
-                        if (balances[i].amountbc < 0)
-                        {
-                            var comm = balances[i].comm;
-                            var amountbc = _converter.Round(-balances[i].amountbc * debitbc / creditbc);
-                            var amount = _converter.Round(balances[i].amount * amountbc / balances[i].amountbc);
-                            unsettledbc -= amountbc;
-                            balances[i] = (comm, amount, amountbc);
-                        }
-                    }
-                    Trace.Assert(balances[0].amount < 0);
-                    Trace.Assert(balances[0].amountbc < 0);
-                    Trace.Assert(unsettledbc < 0);
-                    {
-                        var comm = balances[0].comm;
-                        var amountbc = unsettledbc;
-                        var amount = _converter.Round(balances[0].amount * amountbc / balances[0].amountbc);
-                        balances[0] = (comm, amount, amountbc);
-                    }
-                }
-
-                // Add transactions
-
-                Trace.Assert(balances.Sum(b => b.amountbc) == 0);
-
-                var text = string.Join(" + ", balances.Select(b => $"{b.amount} {b.comm}").Reverse());
-                foreach (var b in balances)
-                {
-                    AddGLTransaction(dt, "s", null, text, -b.amount, b.comm, -b.amountbc, account, settlementAccount, null, project, null);
                 }
             }
         }
