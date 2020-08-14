@@ -1,7 +1,6 @@
-﻿using SpreadsheetLedger.Core.Impl;
-using Xunit;
+﻿using Xunit;
 
-namespace SpreadsheetLedger.CoreTests.Impl
+namespace SpreadsheetLedger.Core.Impl
 {
     public sealed class CurrencyConverterTests
     {

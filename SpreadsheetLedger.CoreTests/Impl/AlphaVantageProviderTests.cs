@@ -1,9 +1,8 @@
-﻿using SpreadsheetLedger.Core.Impl;
-using System;
+﻿using System;
 using System.Linq;
 using Xunit;
 
-namespace SpreadsheetLedger.CoreTests.Impl
+namespace SpreadsheetLedger.Core.Impl
 {
     public class AlphaVantageProviderTests
     {
