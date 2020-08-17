@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Resources;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -6,12 +7,12 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SpreadsheetLedger.ExcelAddIn")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Spreadsheet Ledger Add-in for Excel")]
+[assembly: AssemblyDescription("Add-in for double-entry accounting in Excel.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SpreadsheetLedger.ExcelAddIn")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCompany("Nicholas Buhro")]
+[assembly: AssemblyProduct("Spreadsheet Ledger")]
+[assembly: AssemblyCopyright("Copyright © 2020 Nicholas Buhro")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -34,5 +35,5 @@ using System.Security;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+//[assembly: AssemblyFileVersion("1.0.0.0")]
 

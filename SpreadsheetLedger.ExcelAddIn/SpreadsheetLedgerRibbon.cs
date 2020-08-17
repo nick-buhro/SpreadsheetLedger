@@ -4,6 +4,7 @@ using SpreadsheetLedger.Core;
 using SpreadsheetLedger.Core.Impl;
 using SpreadsheetLedger.Core.Models;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
