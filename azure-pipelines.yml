@@ -9,11 +9,63 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:  
+  solution: 'SpreadsheetLedger.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  Version.Major: 1
+  Version.Minor: 0
+  Version.MajorMinor: $(Version.Major).$(Version.Minor)
+  Version.Patch: $[counter(variables['Version.MajorMinor'], 0)]
+  Version.SemVer: $(Version.Major).$(Version.Minor).$(Version.Patch)
+  Version.Full: $(Version.Major).$(Version.Minor).$(Version.Patch)$(Rev:.r)
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+name: $(Version.Major).$(Version.Minor).$(Version.Patch)$(Rev:.r)
+
+steps:
+
+- task: DownloadSecureFile@1
+  name: cert
+  displayName: 'Download code signing certificate'
+  inputs:
+    secureFile: 'SpreadsheetLedger.ExcelAddIn_TemporaryKey.pfx'
+
+- task: PowerShell@2
+  displayName: 'Install code signing certificate'
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Start adding the PFX file to the certificate store."
+      $pfxpath = '$(cert.secureFilePath)'
+      $password = '$(cert.password)'
+      Add-Type -AssemblyName System.Security
+      $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+      $cert.Import($pfxpath, $password, [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]"PersistKeySet")
+      $store = new-object system.security.cryptography.X509Certificates.X509Store -argumentlist "MY", CurrentUser
+      $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]"ReadWrite")
+      $store.Add($cert)
+      $store.Close()
+
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  displayName: 'Build solution'
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/target:publish /p:ApplicationVersion=$(Build.BuildNumber) /p:PublishURL=http://staging.example.com/   /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ProductName="Spreadsheet Ledger" /p:OutputPath="$(build.ArtifactStagingDirectory)\publish\\"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- publish: $(build.ArtifactStagingDirectory)/publish/
+  artifact: clickonce
+

@@ -191,7 +191,6 @@
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="SpreadsheetLedger.ExcelAddIn_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
@@ -220,7 +219,7 @@
     <ManifestKeyFile>SpreadsheetLedger.ExcelAddIn_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>152FE39109E18A4F503C5B67B6D09EEB14076632</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>2016F067975C99CB95494C112BCB1A7F60B40CBF</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
