@@ -57,7 +57,7 @@ steps:
   displayName: 'Build solution'
   inputs:
     solution: '$(Solution)'
-    msbuildArgs: '/target:publish /p:ApplicationVersion=$(Version.Full) /p:PublishURL=http://staging.example.com/   /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ProductName="Spreadsheet Ledger" /p:OutputPath="$(build.ArtifactStagingDirectory)\publish\"'
+    msbuildArgs: '/target:publish /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ProductName="Spreadsheet Ledger" /p:OutputPath="$(build.ArtifactStagingDirectory)\publish\\"'
     platform: '$(BuildPlatform)'
     configuration: '$(buildConfiguration)'
 
