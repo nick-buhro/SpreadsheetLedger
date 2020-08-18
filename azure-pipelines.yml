@@ -56,12 +56,12 @@ steps:
 - task: VSBuild@1
   displayName: 'Build solution'
   inputs:
-    solution: '$(Solution)'
-    msbuildArgs: '/target:publish /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ProductName="Spreadsheet Ledger" /p:OutputPath="$(build.ArtifactStagingDirectory)\publish\\"'
+    solution: '$(Solution)'    
     platform: '$(BuildPlatform)'
     configuration: '$(buildConfiguration)'
 
 - task: VSTest@2
+  displayName: 'Run tests'
   inputs:
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
@@ -74,6 +74,14 @@ steps:
     codeCoverageEnabled: True
     runTestsInIsolation: True
 
-- publish: $(build.ArtifactStagingDirectory)/publish/
-  artifact: clickonce
+- task: VSBuild@1
+  displayName: 'Build click-once artifacts'
+  inputs:
+    solution: '$(Solution)'
+    msbuildArgs: '/target:publish /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ProductName="Spreadsheet Ledger" /p:PublishDir="$(build.ArtifactStagingDirectory)\publish\\"'
+    platform: '$(BuildPlatform)'
+    configuration: '$(buildConfiguration)'
 
+#- publish: $(build.ArtifactStagingDirectory)/publish/
+#  displayName: 'Deploy click-once artifacts'
+#  artifact: clickonce
