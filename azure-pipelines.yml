@@ -46,7 +46,7 @@ steps:
   inputs:
     restoreSolution: '$(Solution)'
 
-- task: richardfennellBM.BM-VSTS-Versioning-Task.Version-Assemblies-Task.VersionAssemblies
+- task: richardfennellBM.BM-VSTS-Versioning-Task.Version-Assemblies-Task.VersionAssemblies@1
   displayName: 'Patch assembly versions'
   inputs:
     Path: $(Build.SourcesDirectory)
