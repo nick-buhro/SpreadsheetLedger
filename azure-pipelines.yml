@@ -12,15 +12,9 @@ pool:
 variables:  
   Solution: 'SpreadsheetLedger.sln'
   BuildPlatform: 'Any CPU'
-  BuildConfiguration: 'Release'
-  Version.Major: 1
-  Version.Minor: 0
-  Version.MajorMinor: $(Version.Major).$(Version.Minor)
-  Version.Patch: $[counter(variables['Version.MajorMinor'], 0)]
-  Version.SemVer: $(Version.Major).$(Version.Minor).$(Version.Patch)
-  Version.Full: $(Version.Major).$(Version.Minor).$(Version.Patch)$(Rev:.r)
+  BuildConfiguration: 'Release'  
 
-name: $(Version.Major).$(Version.Minor).$(Version.Patch)$(Rev:.r)
+name: '1.0.0.$(Rev:r)'
 
 steps:
 
@@ -46,12 +40,20 @@ steps:
       $store.Add($cert)
       $store.Close()
 
-
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(Solution)'
+
+- task: richardfennellBM.BM-VSTS-Versioning-Task.Version-Assemblies-Task.VersionAssemblies
+  displayName: 'Patch assembly versions'
+  inputs:
+    Path: $(Build.SourcesDirectory)
+    VersionNumber: $(Build.BuildNumber)
+    InjectVersion: False
+    FilenamePattern: AssemblyInfo.*
+    OutputVersion: OutputedVersion
 
 - task: VSBuild@1
   displayName: 'Build solution'
@@ -78,10 +80,10 @@ steps:
   displayName: 'Build click-once artifacts'
   inputs:
     solution: '$(Solution)'
-    msbuildArgs: '/target:publish /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ProductName="Spreadsheet Ledger" /p:PublishDir="$(build.ArtifactStagingDirectory)\publish\\"'
+    msbuildArgs: '/target:publish /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ApplicationVersion="$(Build.BuildNumber)" /p:ProductName="Spreadsheet Ledger" /p:PublishDir="$(build.ArtifactStagingDirectory)\"'
     platform: '$(BuildPlatform)'
     configuration: '$(buildConfiguration)'
 
-#- publish: $(build.ArtifactStagingDirectory)/publish/
-#  displayName: 'Deploy click-once artifacts'
-#  artifact: clickonce
+- publish: $(build.ArtifactStagingDirectory)\
+  displayName: 'Deploy click-once artifacts'
+  artifact: clickonce

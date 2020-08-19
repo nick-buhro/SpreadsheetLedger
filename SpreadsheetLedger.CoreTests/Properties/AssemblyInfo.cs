@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SpreadsheetLedger.CoreTests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SpreadsheetLedger.CoreTests")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCompany("Nicholas Buhro")]
+[assembly: AssemblyProduct("Spreadsheet Ledger")]
+[assembly: AssemblyCopyright("Copyright © 2020 Nicholas Buhro")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
