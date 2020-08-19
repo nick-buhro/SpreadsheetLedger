@@ -80,10 +80,10 @@ steps:
   displayName: 'Build click-once artifacts'
   inputs:
     solution: '$(Solution)'
-    msbuildArgs: '/target:publish /p:UpdateEnabled=true  /p:UpdateMode=Foreground  /p:ApplicationVersion="$(Build.BuildNumber)" /p:ProductName="Spreadsheet Ledger" /p:PublishDir="$(build.ArtifactStagingDirectory)\"'
+    msbuildArgs: '/target:publish /p:ApplicationVersion="$(Build.BuildNumber)"'
     platform: '$(BuildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- publish: $(build.ArtifactStagingDirectory)\
+- publish: $(Build.SourcesDirectory)\publish
   displayName: 'Deploy click-once artifacts'
-  artifact: clickonce
+  artifact: publish
