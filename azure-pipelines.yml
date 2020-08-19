@@ -84,6 +84,6 @@ steps:
     platform: '$(BuildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- publish: $(Build.SourcesDirectory)\publish
+- publish: $(Build.SourcesDirectory)\SpreadsheetLedger.ExcelAddIn\bin\$(buildConfiguration)\app.publish\
   displayName: 'Deploy click-once artifacts'
   artifact: publish
